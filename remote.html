@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<head>
+<style>
+buttona {
+    color: #900;
+    font-weight: bold;
+    font-size: 200%;
+    height: 100px;
+    width: 120px;
+}
+h1 {
+    color: #900;
+    font-weight: bold;
+    font-size: 300%;
+}
+h2 {
+    color: #000;
+    font-weight: bold;
+    font-size: 200%;
+}
+h3 {
+    color: #00f;
+    font-weight: bold;
+    font-size: 300%;
+}
+
+</style>
+</head>
+<script type='text/javascript' src='knockout-3.3.0.js'></script>
+<html>
+<h2>
+opponent: <input style="font-size:150%" type="text" id="opponent" value="enter team"></h2>
+<h2>
+<div>GAME # <span data-bind='text: gameNum'>&nbsp;</span> </div>
+</h2>
+<button style="font-size:150%;font-weight:bold;color:black;background-color:yellow;height:60px;width:130px" data-bind='click: registerGamePlus'>GAME +</button>
+<button style="font-size:150%;font-weight:bold;color:black;background-color:yellow;height:60px;width:130px" data-bind='click: registerGameMinus'>GAME -</button>
+<button style="font-size:150%;font-weight:bold;color:black;background-color:green;height:60px;width:130px" data-bind='click: startMatch'>START</button>
+<h1>PARKLAND</h1>
+<button style="font-size:150%;font-weight:bold;color:black;background-color:grey;height:100px;width:120px" data-bind='click: registerHomePlus'>HOME +</button>
+<button style="font-size:150%;font-weight:bold;color:black;background-color:grey;height:100px;width:120px" data-bind='click: registerHomeMinus'>HOME -</button>
+<span style="color:red;font-size:600%;font-weight:bold" data-bind='text: homeScore'>&nbsp;</span>
+<h1>OPPONENT </h1> 
+<button style="font-size:150%;font-weight:bold;color:black;background-color:grey;height:100px;width:120px" data-bind='click: registerAwayPlus'>AWAY +</button>
+<button style="font-size:150%;font-weight:bold;color:black;background-color:grey;height:100px;width:120px" data-bind='click: registerAwayMinus'>AWAY -</button>
+<span style="color:black;font-size:600%;font-weight:bold" data-bind='text: awayScore'>&nbsp;</span> 
+
+
+
+<script>
+
+var ClickCounterViewModel = function() {
+    this.homeScore = ko.observable(0);
+    this.awayScore = ko.observable(0);
+    this.gameNum = ko.observable(1);
+    var xhr = new XMLHttpRequest();
+    var mysend;
+
+    this.startMatch = function() {
+        this.homeScore(this.homeScore()*0);
+	this.awayScore(this.awayScore()*0);
+	this.poststart();
+    }
+    
+    this.registerGamePlus = function() {
+        this.gameNum(this.gameNum() + 1);
+    };
+ 
+    this.registerGameMinus = function() {
+        this.gameNum(this.gameNum() - 1);
+    };
+ 
+    this.registerHomePlus = function() {
+        this.homeScore(this.homeScore() + 1);
+	this.postscore();
+    };
+ 
+    this.registerHomeMinus = function() {
+        this.homeScore(this.homeScore() - 1);
+	this.postscore();
+    };
+    this.registerAwayPlus = function() {
+        this.awayScore(this.awayScore() + 1);
+	this.postscore();
+    };
+ 
+    this.registerAwayMinus = function() {
+        this.awayScore(this.awayScore() - 1);
+	this.postscore();
+    };
+
+    this.postscore = function() {
+	xhr.open("POST", "http://www.foosechek.org/script.php", true);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        mysend = "game="+this.gameNum()+"&id=SCORE&home="+this.homeScore()+"&away="+this.awayScore();
+	console.debug(this.homeScore());
+	console.debug(mysend);
+	xhr.send(mysend);
+    };
+    this.poststart = function() {
+	xhr.open("POST", "http://www.foosechek.org/script.php", true);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        mysend = "game="+this.gameNum()+"&id=START&opponent="+document.getElementById("opponent").value;
+	console.debug(mysend);
+	xhr.send(mysend);
+    };
+};
+ 
+ko.applyBindings(new ClickCounterViewModel());
+</script>
+</html>
